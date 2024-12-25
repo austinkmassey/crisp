@@ -1,0 +1,11 @@
+# Minimal Makefile to showcase Crisp usage.
+# Typically used by Crisp to handle indexing or other housekeeping tasks.
+#
+# You might run:
+#   make -f .crisp/Makefile.crisp index
+
+CRISP_SCRIPTS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+index:
+	bash "$(CRISP_SCRIPTS_DIR)/scripts/index.sh" all
+

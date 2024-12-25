@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Crisp CLI entrypoint
+# Minimal dispatcher for Crisp subcommands.
+
+set -euo pipefail
+
+CRISP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "${CRISP_DIR}/scripts" && pwd)"
+
+SUBCOMMAND="${1:-}"
+
+case "$SUBCOMMAND" in
+  status)
+    shift
+    source "${SCRIPT_DIR}/status.sh"
+    crisp_status "$@"
+    ;;
+  add)
+    shift
+    source "${SCRIPT_DIR}/add.sh"
+    crisp_add "$@"
+    ;;
+  index)
+    shift
+    source "${SCRIPT_DIR}/index.sh"
+    crisp_index "$@"
+    ;;
+  *)
+    echo "Crisp CLI"
+    echo
+    echo "Usage: crisp <command> [options]"
+    echo "Commands:"
+    echo "  status              Show Crisp status"
+    echo "  add <type>          Add a new backlog/sprint/session"
+    echo "  index <type|all>    Update index of artifacts"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,16 @@
+# Editor/OS files
+.DS_Store
+.idea/
+*.swp
+
+# Bats or Crisp logs
+test_env/
+logs/
+
+# If Crisp creates any build artifacts:
+*.out
+*.log
+
+# For generated indices or ephemeral files:
+*.index
+
