@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#
+# Generate index files for backlog, sprint, and session artifacts.
+
+function get_pending_files(){
+  local type="${1:-}"
+  
+  local index_file
+  index_file="${CRISP_DOC}/${type}_index.md"
+  
+  local type_dir
+  type_dir="${CRISP_DOC}/${type}/"
+
+  declare -n output_files="$2"
+  
+  # Ensure index_file exists, or default to processing all files
+  if [[ ! -f "$index_file" ]]; then
+      #When index file is not found, default to all files
+      output_files=($(find "$type_dir" -type f))
+  else
+      # Files in type_dir modified after index_file
+      output_files=($(find "$type_dir" -type f -newer "$index_file"))
+  fi
+}
+
+function index_artifacts() {
+
+  ## PARSE arguments
+  local ARTIFACT_TYPE="$1"
+
+  local INDEX_FILE="${CRISP_DOC}/${ARTIFACT_TYPE}_index.md"
+
+  declare -A INDEX_ASS
+
+  ## Determine pending artifacts
+  local PENDING_INDEX
+  get_pending_files "$ARTIFACT_TYPE" PENDING_INDEX
+
+  ## READ CURRENT INDEX and metadata into dict
+  if [[ -f "$INDEX_FILE" ]]; then
+      CURRENT_ARTIFACT=""
+      regex='^\[(.*)\]\(.*\)$' # if [001.md](docs/backlog/001.md) then captures 001.md
+      while IFS= read -r LINE; do
+          if [[ $LINE =~ $regex ]]; then
+              CURRENT_ARTIFACT="${BASH_REMATCH[1]}"
+              INDEX_ASS["$CURRENT_ARTIFACT"]=""
+              [[ -f "$artifact" ]] || continue
+              local relative_path
+              relative_path="$(realpath --relative-to="$(pwd)" "$artifact")"
+              INDEX_ASS["$CURRENT_ARTIFACT"]="- [$(basename "$CURRENT_ARTIFACT")](${relative_path})"
+          fi
+          ## Add lines between entries into dict value
+          #INDEX_ASS["$CURRENT_ARTIFACT"]+="$LINE"$'\n'
+      done < "$INDEX_FILE"
+  fi
+
+  
+  ## PARSE each pending artifact, add/update ass
+  # Update or add artifacts from modified files
+  for FILE in "${PENDING_INDEX[@]}"; do
+      #SPRINT_NUMBER=$(yq --front-matter=extract e '.sprint' "$FILE")
+  
+      # Skip files with no sprint number
+      #if [ -z "$SPRINT_NUMBER" ] || [ "$SPRINT_NUMBER" = "null" ]; then
+      #    continue
+      #fi
+  
+      # Extract and store sprint information
+      [[ -f "$FILE" ]] || continue
+      local relative_path
+      relative_path="$(realpath --relative-to="$(pwd)" "$FILE")"
+      INDEX_ASS["$FILE"]="- [$(basename "$FILE")](${relative_path})"
+  done
+
+  ## RECREATE index with arr
+  if [[ -f "$INDEX_FILE" ]]; then
+    rm -f "$INDEX_FILE"
+  fi
+
+  echo "# ${ARTIFACT_TYPE^} Index" >> "$INDEX_FILE"
+  echo >> "$INDEX_FILE"
+
+  #for SPRINT_NUMBER in $(printf "%s\n" "${!UPDATED_SPRINTS[@]}" | sort -n); do
+  #    echo "${UPDATED_SPRINTS[$SPRINT_NUMBER]}"
+  #    echo ""
+  #done
+
+  for artifact in $(printf "%s\n" "${!INDEX_ASS[@]}" | sort -n); do
+    value="${INDEX_ASS[$artifact]}"
+    echo "$value" >> "$INDEX_FILE"
+  done
+}
+
+function remove_index() {
+  local TYPE="${1:-}"
+  #shift || true
+
+  local HARD_FLAG
+  HARD_FLAG="${2:-}"
+  #shift
+
+  local INDEX_FILE
+  INDEX_FILE="${CRISP_DOC}/${TYPE}_index.md"
+
+  if [[ "$HARD_FLAG" == "true" && -f "$INDEX_FILE" ]]; then
+    rm -f "$INDEX_FILE"
+  fi
+
+}
+
+function crisp_index() {
+  local mode="${1:-}"
+  shift || true
+
+  local hard_flag="false"
+  hard_arg="${1:-}"
+  if [[ $hard_arg == "--hard" ]]; then
+    hard_flag="true"
+  fi
+
+  case "$mode" in
+    backlog|sprint|session)
+      index_artifacts "$mode"
+      remove_index "$mode" $hard_flag
+      ;;
+    all)
+      index_artifacts "backlog"
+      remove_index "backlog" $hard_flag
+      index_artifacts "sprint"
+      remove_index "sprint" $hard_flag
+      index_artifacts "session"
+      remove_index "session" $hard_flag
+      ;;
+    *)
+      echo "Usage: crisp index <backlog|sprint|session|all> [--hard]"
+      exit 1
+      ;;
+  esac
+}
+

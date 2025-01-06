@@ -5,6 +5,7 @@
 # This Makefile provides the following functionalities:
 #   - Setup a test environment
 #   - Run Bats tests
+#   - Run index-specific Bats tests
 #   - Teardown test environment
 #   - Install Crisp into a new project directory
 #   - Clean up test artifacts
@@ -12,6 +13,7 @@
 # Usage:
 #   make help                     Show available commands
 #   make test                     Setup, run tests, and teardown
+#   make index_tests              Run index-specific Bats tests
 #   make install DESTDIR=path     Install Crisp into the specified directory
 #   make clean                    Remove test environment directory
 #
@@ -36,7 +38,7 @@ INSTALL_DIR := $(DESTDIR)
 # Phony Targets
 # =============================================================================
 
-.PHONY: help setup_test run_tests teardown_test test install clean check_dependencies
+.PHONY: help setup_test run_tests index_tests teardown_test test install clean check_dependencies
 
 # =============================================================================
 # Help Target
@@ -50,15 +52,17 @@ help:
 	@echo "Available Targets:"
 	@echo "  help                     Show this help message"
 	@echo "  setup_test               Setup test environment"
-	@echo "  run_tests                Run Bats tests"
+	@echo "  run_tests                Run all Bats tests"
+	@echo "  index_tests              Run index-specific Bats tests"
 	@echo "  teardown_test            Teardown test environment"
 	@echo "  test                     Setup, run tests, and teardown"
 	@echo "  install DESTDIR=path     Install Crisp into a new project directory"
 	@echo "  clean                    Remove test environment directory"
-	@echo "  check_dependencies      Check for required dependencies"
+	@echo "  check_dependencies       Check for required dependencies"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
+	@echo "  make index_tests"
 	@echo "  make install DESTDIR=/path/to/my_project"
 	@echo ""
 	@echo "  To run Bats tests with a specific directory:"
@@ -89,8 +93,17 @@ setup_test: check_dependencies
 
 run_tests:
 	@echo "Running Bats tests..."
-	@CRISP_PARENT_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/crisp_test.bats
+	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/crisp_test.bats
 	@echo "Bats tests completed."
+
+# =============================================================================
+# Run Index-Specific Tests
+# =============================================================================
+
+index_tests:
+	@echo "Running index-specific Bats tests..."
+	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats
+	@echo "Index-specific Bats tests completed."
 
 # =============================================================================
 # Teardown Test Environment
@@ -133,4 +146,3 @@ clean:
 	@echo "Cleaning up test environment..."
 	@rm -rf $(TEST_ENV_DIR)
 	@echo "Cleaned up '$(TEST_ENV_DIR)'"
-

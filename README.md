@@ -187,24 +187,70 @@ This layout and code give you a minimal, functional Crisp framework to build upo
 
 ---
 
-## Crisp Backlog
+## **Crisp Backlog**
 
-This is a small backlog for the implementation of the Crisp CLI.
+This is a structured backlog for implementing the Crisp CLI.
 
-### Artifact Creation
-As a user, I want to be able to create artifacts of a specified type so I can fill them out with a text editor plan out my project.
+### **Artifact Creation**
 
-**Given** A activated environment **when** they execute the command `crips <item>` **then** Crisp will create the item in the `.crisp/<item>` folder of the current environment
+**Goal**: Allow users to create artifacts of a specified type for project planning.
 
-### Indexing
-As a user, I want to be able to see a short summary of all of my artifacts in index files so that I can review or navigate to them easily.
+- **User Story**:  
+  As a user, I want to create artifacts of a specified type so I can fill them out with a text editor and plan my project.
 
-**Given** a project with artifacts, **when** I run `crisp index`, **then** all index files are updated to reflect current artifacts.
+#### **Acceptance Criteria**:
+1. **Given** an activated environment,  
+   **When** I execute the command `crisp <item>`,  
+   **Then** Crisp creates the item in the `.crisp/<item>` folder of the current environment.
 
-**Given** a project with existing index files, **when** I run `crisp index`, **then** only artifacts with modified timestamps after the modified timestamp of their index will be parsed and updated in the file.
+### **Indexing**
 
-**Given** aproject with existing index file, **when** I run `crisp index`, **then** only the entries in the index that need to be updated will be changed, all other entries that point to artifacts that have not been changed will persist in the next version of the index file.
+**Goal**: Provide a way to summarize and navigate artifacts through index files.
 
-As a user, I want to be able to completely reset (delete index files, rescan all artifacts, create new index files) all index file by calling `crisp index --hard` so that I can see the current state of all artifacts with confidence.
+- **User Story 1**:  
+  As a user, I want to see a short summary of all artifacts in index files so that I can review or navigate to them easily.
 
-**Given** a project with existing indexes and artifacts, **when** `crisp index --hard` is executed, all index files are deleted and recreated.
+#### **Acceptance Criteria**:
+1. **Given** a project with artifacts,  
+   **When** I run `crisp index`,  
+   **Then** all index files are updated to reflect the current artifacts.
+
+2. **Given** a project with existing index files,  
+   **When** I run `crisp index`,  
+   **Then** only artifacts with modified timestamps after the modified timestamp of their index file are parsed and updated.
+
+3. **Given** a project with existing index files,  
+   **When** I run `crisp index`,  
+   **Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed.
+
+- **User Story 2**:  
+  As a user, I want to completely reset all index files with `crisp index --hard` so that I can confidently see the current state of all artifacts.
+
+#### **Acceptance Criteria**:
+1. **Given** a project with existing indexes and artifacts,  
+   **When** I execute `crisp index --hard`,  
+   **Then** all index files are deleted and recreated from scratch.
+
+### **Optimized Indexing**
+
+**Goal**: Streamline artifact summarization and ensure efficient indexing functionality.
+
+- **User Story 1**:  
+  As a developer, I want to summarize artifacts through one interface so that the summarizing functionality is easy to integrate and customize.
+
+#### **Acceptance Criteria**:
+1. **Given** an artifact path,  
+   **When** I call a function like `summarize_artifact`,  
+   **Then** a type-specific summary of the artifact is returned.
+
+- **User Story 2**:  
+  As a user, I want indexing to only require parsing and scanning files that have been updated so that the indexing process is fast.
+
+#### **Acceptance Criteria**:
+1. **Given** an artifact directory and an index file,  
+   **When** I call a function like `get_modified_artifacts`,  
+   **Then** a list of files that are newer or modified after the index file is returned.
+
+2. **Given** an index file,  
+   **When** I call a function like `parse_index`,  
+   **Then** an associative array, keyed by paths, is returned.
