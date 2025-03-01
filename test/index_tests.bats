@@ -12,8 +12,8 @@ teardown() {
 }
 
 # Tests for get_pending_files
+# PASS
 @test "get_pending_files handles missing index file by including all files" {
-  set -x
   local type="test_type"
   rm -rf "$CRISP_DOC/$type"
   mkdir -p "$CRISP_DOC/$type"
@@ -28,6 +28,7 @@ teardown() {
   [[ "${pending_files[*]}" == *"$CRISP_DOC/$type/file2.txt"* ]]
 }
 
+#PASS
 @test "get_pending_files filters files modified after index file" {
   local type="test_type"
   rm -rf "$CRISP_DOC/$type"
@@ -46,6 +47,7 @@ teardown() {
   [[ "${pending_files[*]}" == *"$CRISP_DOC/$type/file2.txt"* ]]
 }
 
+#PASS
 @test "get_pending_files returns no files if none are newer than index file" {
   local type="test_type"
   rm -rf "$CRISP_DOC/$type"
@@ -62,6 +64,7 @@ teardown() {
   [[ -z "${pending_files[*]}" ]]
 }
 
+#PASS
 @test "get_pending_files handles empty directories" {
   local type="test_type"
   rm -rf "$CRISP_DOC/$type"
@@ -75,6 +78,7 @@ teardown() {
   [[ -z "${pending_files[*]}" ]]
 }
 
+#PASS
 @test "get_pending_files handles directories with no index file and no files" {
   local type="test_type"
   rm -rf "$CRISP_DOC/$type"
@@ -87,22 +91,22 @@ teardown() {
 }
 
 # Tests for parse_current_index
+#PASS
 @test "parse_current_index populates index_data from existing index file" {
-  set -x
   local index_file="$CRISP_DOC/test_index.md"
   cat <<EOF > "$index_file"
-[001.md](docs/backlog/001.md)
-[002.md](docs/backlog/002.md)
+- [001.md](docs/backlog/001.md)
+- [002.md](docs/backlog/002.md)
 EOF
 
   declare -A index_data
   parse_current_index "$index_file" index_data
 
-  [[ "${index_data[001.md]}" == "[001.md](docs/backlog/001.md)" ]]
-  [[ "${index_data[002.md]}" == "[002.md](docs/backlog/002.md)" ]]
-  set +x
+  [[ "${index_data[001.md]}" == "- [001.md](docs/backlog/001.md)\n" ]]
+  [[ "${index_data[002.md]}" == "- [002.md](docs/backlog/002.md)\n" ]]
 }
 
+#PASS
 @test "parse_current_index handles missing index file gracefully" {
   local index_file="$CRISP_DOC/missing_index.md"
   declare -A index_data
@@ -112,6 +116,7 @@ EOF
 }
 
 # Tests for update_index_data
+#PASS
 @test "update_index_data updates index_data with pending files" {
   declare -A index_data
   declare -a pending_files
@@ -121,10 +126,11 @@ EOF
 
   update_index_data index_data pending_files
 
-  [[ "${index_data[$CRISP_DOC/file1.txt]}" == "- [file1.txt]($CRISP_DOC/file1.txt)" ]]
-  [[ "${index_data[$CRISP_DOC/file2.txt]}" == "- [file2.txt]($CRISP_DOC/file2.txt)" ]]
+  [[ "${index_data[file1.txt]}" == "- [file1.txt]($CRISP_DOC/file1.txt)\n" ]]
+  [[ "${index_data[file2.txt]}" == "- [file2.txt]($CRISP_DOC/file2.txt)\n" ]]
 }
 
+#PASS
 @test "update_index_data skips missing pending files" {
   declare -A index_data
   declare -a pending_files=("$CRISP_DOC/missing_file.txt")
@@ -135,6 +141,7 @@ EOF
 }
 
 # Tests for write_index_file
+#PASS
 @test "write_index_file creates a new index file from index_data" {
   local index_file="$CRISP_DOC/test_index.md"
   declare -A index_data=(
@@ -144,10 +151,15 @@ EOF
 
   write_index_file "$index_file" index_data
 
-  grep "- [file1.txt](docs/file1.txt)" "$index_file"
-  grep "- [file2.txt](docs/file2.txt)"
-}
+  # Check that the file contains the expected entries
+  run grep -F -- "- [file1.txt](docs/file1.txt)" "$index_file"
+  [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
 
+  run grep -F -- "- [file2.txt](docs/file2.txt)" "$index_file"
+  [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
+}
+ 
+#PASS
 @test "write_index_file overwrites existing index file" {
   local index_file="$CRISP_DOC/test_index.md"
   echo "Old content" > "$index_file"
@@ -158,8 +170,11 @@ EOF
 
   write_index_file "$index_file" index_data
 
-  ! grep "Old content" "$index_file"
-  grep "- [file1.txt](docs/file1.txt)" "$index_file"
+  run grep -F -- "Old content" "$index_file"
+  [ ! "$status" -eq 0 ] # Assert the exit status is 0 (match found)
+
+  run grep -F -- "- [file1.txt](docs/file1.txt)" "$index_file"
+  [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
 }
 
 # Integration test for process_index_artifacts
@@ -173,7 +188,10 @@ EOF
 
   local index_file="$CRISP_DOC/${type}_index.md"
   [[ -f "$index_file" ]]
-  grep "- [file1.txt]" "$index_file"
-  grep "- [file2.txt]" "$index_file"
+  run grep -F -- "- [file1.txt]" "$index_file"
+  [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
+
+  run grep -F -- "- [file2.txt]" "$index_file"
+  [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
 }
 

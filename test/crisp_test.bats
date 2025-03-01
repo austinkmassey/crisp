@@ -60,28 +60,24 @@ teardown() {
 }
 
 @test "crisp index backlog updates backlog_index.md in output directory" {
-    run rm ${CRISP_DOC}/backlog/*
-    run rm ${CRISP_DOC}/backlog/backlog_index.md
-    run crisp add backlog
-    [ "$status" -eq 0 ]
-    run crisp add backlog
-    [ "$status" -eq 0 ]
-    run crisp add backlog
-    [ "$status" -eq 0 ]
-    run crisp index backlog
-    [ "$status" -eq 0 ]
-    [ -f "${CRISP_DOC}/backlog_index.md" ]
-
-    # Debugging: Print file content
-    cat "${CRISP_DOC}/backlog_index.md" >&2
-
-    # Use silent grep to match and exit cleanly
-    grep -q "001.md" "${CRISP_DOC}/backlog_index.md"
-    grep -q "002.md" "${CRISP_DOC}/backlog_index.md"
-    grep -q "003.md" "${CRISP_DOC}/backlog_index.md"
-    [ $? -eq 0 ]
+  run rm ${CRISP_DOC}/backlog/*
+  run rm ${CRISP_DOC}/backlog/backlog_index.md
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp index backlog
+  [ "$status" -eq 0 ]
+  [ -f "${CRISP_DOC}/backlog_index.md" ]
+  
+  # Use silent grep to match and exit cleanly
+  grep -q "001.md" "${CRISP_DOC}/backlog_index.md"
+  grep -q "002.md" "${CRISP_DOC}/backlog_index.md"
+  grep -q "003.md" "${CRISP_DOC}/backlog_index.md"
+  [ $? -eq 0 ]
 }
-
 
 @test "crisp index --hard regenerates indexes in output directory" {
   run crisp add backlog
@@ -99,12 +95,4 @@ teardown() {
   # The new backlog index should not contain the "MANUAL EDIT" text
   ! grep "MANUAL EDIT" "${CRISP_DOC}/backlog_index.md"
 }
-
-## Load configuration to get output directory
-#setup_test_environment() {
-#  # Assuming the output_directory is defined in config.yaml
-#  # OUTPUT_DIR="$(yq e '.crisp.output_directory' "${CRISP_PARENT_DIR}/crisp/config.yaml")"
-#}
-
-#setup_test_environment
 
