@@ -1,6 +1,21 @@
 ## Purpose
 
-This project simplifies developers' workflows by merging Agile methodologies with Docs-as-Code principles, fostering collaboration and innovation in small-team and individual projects. It emphasizes **Developer Experience (DX), sustainable software practices, and developer autonomy** by ensuring workflows are efficient, maintainable, and adaptable. Additionally, it explores **AI as a contributing entity**, integrating AI-assisted documentation, automation, and Agile facilitation to enhance productivity and long-term maintainability.
+Explore:
+
+    - **Developer Experience (DX)**
+    - **Sustainable Software Practices**
+    - **Developer Autonomy**
+    - **AI as a contributing entity**
+
+
+## Objectives
+
+- Develop tools and documentation that implement and demonstrate **Crisp Principles**, ensuring enhanced **Developer Experience (DX)** and autonomy.
+- Define and document **Crisp Principles**, an adaptation of Agile that incorporates Docs-as-Code methodologies, AI assistance, and sustainable software practices.
+- Integrate AI into Agile workflows, utilizing AI-assisted documentation, code suggestions, and backlog management.
+- Iteratively improve tools and methodologies by applying them to real-world, non-trivial projects (**"dogfooding"**).
+- Share principles, tools, and documentation with the public by publishing on GitHub.
+- Encourage discussions on principles, their implementation, and their impact on development workflows.
 
 ## Stakeholders
 
@@ -8,15 +23,6 @@ This project simplifies developers' workflows by merging Agile methodologies wit
 - **Developers, Agile Practitioners, and Docs-as-Code Enthusiasts** – Others interested in leveraging this resource for their workflows.
 - **Contributors** – Anyone interested in improving the project through code contributions, documentation enhancements, and discussions on refining tools and principles.
 - **AI Agents** – AI-driven tools that assist in Agile facilitation, documentation updates, and intelligent code suggestions.
-
-## Objectives
-
-- Define and document **Crisp Principles**, an adaptation of Agile that incorporates Docs-as-Code methodologies, AI assistance, and sustainable software practices.
-- Develop tools and documentation that implement and demonstrate **Crisp Principles**, ensuring enhanced **Developer Experience (DX)** and autonomy.
-- Integrate AI into Agile workflows, utilizing AI-assisted documentation, code suggestions, and backlog management.
-- Iteratively improve tools and methodologies by applying them to real-world, non-trivial projects (**"dogfooding"**).
-- Share principles, tools, and documentation with the public by publishing on GitHub.
-- Encourage discussions on principles, their implementation, and their impact on development workflows.
 
 ## Risks
 
