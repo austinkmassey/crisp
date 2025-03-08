@@ -10,8 +10,8 @@ Explore:
 
 ## Objectives
 
-- Develop tools and documentation that implement and demonstrate **Crisp Principles**, ensuring enhanced **Developer Experience (DX)** and autonomy.
 - Define and document **Crisp Principles**, an adaptation of Agile that incorporates Docs-as-Code methodologies, AI assistance, and sustainable software practices.
+- Develop tools and documentation that implement and demonstrate **Crisp Principles**, ensuring enhanced **Developer Experience (DX)** and autonomy.
 - Integrate AI into Agile workflows, utilizing AI-assisted documentation, code suggestions, and backlog management.
 - Iteratively improve tools and methodologies by applying them to real-world, non-trivial projects (**"dogfooding"**).
 - Share principles, tools, and documentation with the public by publishing on GitHub.

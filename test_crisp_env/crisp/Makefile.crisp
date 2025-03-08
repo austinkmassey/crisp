@@ -1,0 +1,47 @@
+# Makefile for updating sprint.md and backlog.md
+#
+# You might run:
+#   make -f .crisp/Makefile.crisp index
+
+CRISP_SCRIPTS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+SPRINT_DIR = sprint
+BACKLOG_DIR = backlog
+SCRIPTS_DIR = scripts
+
+SPRINT_MD = sprint.md
+BACKLOG_MD = backlog.md
+TEMP_SPRINT_MD = .sprint.tmp.md
+TEMP_BACKLOG_MD = .backlog.tmp.md
+
+.PHONY: all update_sprint update_backlog clean
+
+# Default target
+all: $(SPRINT_MD) $(BACKLOG_MD)
+
+index:
+	bash "$(CRISP_SCRIPTS_DIR)/scripts/index.sh" all
+
+# Update sprint.md if files in sprint/ change
+$(SPRINT_MD): $(wildcard $(SPRINT_DIR)/*.md)
+	@echo "Updating sprint.md..."
+	@$(SCRIPTS_DIR)/summarize_sprint.sh $(SPRINT_MD) $^ > $(TEMP_SPRINT_MD)
+	@mv $(TEMP_SPRINT_MD) $(SPRINT_MD)
+	@echo "Updated $(SPRINT_MD)"
+
+# Update backlog.md if files in backlog/ change
+$(BACKLOG_MD): $(wildcard $(BACKLOG_DIR)/*.md)
+	@echo "Updating backlog.md..."
+	@$(SCRIPTS_DIR)/generate_backlog.sh $^ > $(TEMP_BACKLOG_MD)
+	@mv $(TEMP_BACKLOG_MD) $(BACKLOG_MD)
+	@echo "Updated $(BACKLOG_MD)"
+
+# Manual update commands
+update_sprint: $(SPRINT_MD)
+update_backlog: $(BACKLOG_MD)
+
+# Clean generated files
+clean:
+	@rm -f $(SPRINT_MD) $(BACKLOG_MD) $(TEMP_SPRINT_MD) $(TEMP_BACKLOG_MD)
+	@echo "Cleaned up generated files"
+

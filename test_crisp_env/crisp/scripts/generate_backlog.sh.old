@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Define the priorities and the headings you want.
+# Adjust these if you have different categories.
+PRIORITIES=("must_have" "should_have" "could_have" "wont_have")
+
+# Convert priority keys to human-readable headings
+heading_for_priority() {
+    local p=$1
+    # Replace underscores with spaces and capitalize first letter of each word
+    echo "$p" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g'
+}
+
+# Create or overwrite backlog.md
+echo "# Backlog Overview" > backlog.md
+echo "" >> backlog.md
+
+for PRIORITY in "${PRIORITIES[@]}"; do
+    HEADING=$(heading_for_priority "$PRIORITY")
+    echo "## $HEADING" >> backlog.md
+    echo "" >> backlog.md
+
+    # Loop through all markdown files in the backlog directory
+    for FILE in backlog/*.md; do
+        # Extract priority, status, and title using yq
+        FILE_PRIORITY=$(yq --front-matter=extract e '.priority' "$FILE")
+        
+        # Check if this file matches the current priority category
+        if [ "$FILE_PRIORITY" = "$PRIORITY" ]; then
+            STATUS=$(yq --front-matter=extract e '.status' "$FILE")
+            TITLE=$(yq --front-matter=extract e '.title' "$FILE")
+            SPRINT=$(yq --front-matter=extract e '.sprint' "$FILE")
+            FILENAME=$(basename "$FILE")
+
+            # If title is missing, use the filename (without extension)
+            if [ "$TITLE" = "null" ]; then
+                TITLE="${FILENAME%.md}"
+            fi
+
+            # Capitalize status to make it look nicer
+            STATUS_CAP="$(tr '[:lower:]' '[:upper:]' <<< "${STATUS:0:1}")${STATUS:1}"
+
+            # Add a line with status and a wiki-style link
+            echo "- [${STATUS_CAP}] $SPRINT [[backlog/$FILENAME|$TITLE]]" >> backlog.md
+        fi
+    done
+    echo "" >> backlog.md
+done
+
