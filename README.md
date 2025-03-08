@@ -36,7 +36,7 @@ After activating Crisp:
 
 Customize:
 
-- the tool lives in the project's repository. It's scripts and templates can be customized for each project
+- the tool lives in the project's repository. Its scripts and templates can be customized for each project
 
 ## Commands
 
