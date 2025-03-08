@@ -1,31 +1,54 @@
-## Crisp CLI Backlog
-
 This is a structured backlog for implementing the Crisp CLI.
 
-### Artifact Creation
+## Environment Management
 
-**Goal**
-    Allow users to create artifacts of a specified type for project planning.
+Users can activate and deativate project specific crisp environments in their shell.
 
-**User Story**
-
-    As a user, I want to create artifacts of a specified type so I can fill them out with a text editor and plan my project.
-
-**Acceptance Criteria**:
-
-    **Given** an activated environment,  
-    **When** I execute the command `crisp <item>`,  
-    **Then** Crisp creates the item in the `.crisp/<item>` folder of the current environment.
-
-### Indexing
-
-**Goal**
-    Provide a way to summarize and navigate artifacts through index files.
-
-**User Story**:  
-    As a user, I want to see a short summary of all artifacts in index files so that I can review or navigate to them easily.
+### Activate Environment
 
 **Acceptance Criteria**
+
+    **Given** a valid crisp installation
+    **When** `source .crisp/scripts/activate.sh` is executed
+    **Then** Crisp commands and environmental variables are sourced into the shell
+
+### Deactivate Environment
+
+**Acceptance Criteria**
+
+    **Given** an activated environment
+    **When** `source .crisp/scripts/deactivate.sh` is executed
+    **Then** Crisp commands and environmental variables are removed from the shell
+
+## Artifacts Management
+
+### Create Artifacts
+
+### Acceptance Criteria
+
+    **Given** an activated environment
+    **When** The command `crisp <item>` is executed
+    **Then** Crisp creates the item in the output folder of the current environment.
+
+### Customize Artifacts
+
+### Acceptance Criteria
+
+    **Given** an activated environment
+    **When** The command `crisp <item>` is executed
+    **Then** A template in .crisp/templates, of the correct type, is used as the base of the new item.
+
+## Index
+
+Provide a way to summarize and navigate artifacts through index files.
+    
+ - see a short summary of all artifacts in index files
+ - see a link to the index so that I can review or navigate to them easily
+ - indexes can be created "from scratch"
+ - indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
+ - indexes are updated only when needed, preserving previously indexed information into new version of index file
+
+### Acceptance Criteria
 
     **Given** a project with artifacts,  
     **When** I run `crisp index`,  
@@ -47,8 +70,6 @@ This is a structured backlog for implementing the Crisp CLI.
     **Given** a project with existing indexes and artifacts,  
     **When** I execute `crisp index --hard`,  
     **Then** all index files are deleted and recreated from scratch.
-
-### Optimized Indexing
 
 **Goal**
     Streamline artifact summarization and ensure efficient indexing functionality.

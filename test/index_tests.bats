@@ -101,7 +101,6 @@ EOF
 
   declare -A index_data
   parse_current_index "$index_file" index_data
-
   [[ "${index_data[001.md]}" == "- [001.md](docs/backlog/001.md)\n" ]]
   [[ "${index_data[002.md]}" == "- [002.md](docs/backlog/002.md)\n" ]]
 }

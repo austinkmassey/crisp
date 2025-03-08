@@ -13,7 +13,7 @@
 # Usage:
 #   make help                     Show available commands
 #   make test                     Setup, run tests, and teardown
-#   make index_tests              Run index-specific Bats tests
+#   make run_index_tests          Run index-specific Bats tests
 #   make install DESTDIR=path     Install Crisp into the specified directory
 #   make clean                    Remove test environment directory
 #
@@ -100,7 +100,7 @@ run_tests:
 # Run Index-Specific Tests
 # =============================================================================
 
-index_tests:
+run_index_tests:
 	@echo "Running index-specific Bats tests..."
 	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats
 	@echo "Index-specific Bats tests completed."
@@ -118,7 +118,7 @@ teardown_test:
 # Run All Tests
 # =============================================================================
 
-test: setup_test run_tests teardown_test
+test: setup_test run_tests run_index_tests teardown_test
 	@echo "All tests executed successfully."
 
 # =============================================================================
