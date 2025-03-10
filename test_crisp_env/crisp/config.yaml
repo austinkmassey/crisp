@@ -1,8 +1,0 @@
-# Minimal Crisp configuration.
-# Extend this with any project-specific configurations.
-
-crisp:
-  version: "0.1"
-  project_name: "Crisp CLI Agile Framework"
-  output_directory: "docs"
-
