@@ -6,92 +6,156 @@ Users can activate and deativate project specific crisp environments in their sh
 
 ### Activate Environment
 
-**Acceptance Criteria**
+**Given** a valid crisp installation
+**When** `source .crisp/scripts/activate.sh` is executed
+**Then** Crisp commands and environmental variables are sourced into the shell
 
-    **Given** a valid crisp installation
-    **When** `source .crisp/scripts/activate.sh` is executed
-    **Then** Crisp commands and environmental variables are sourced into the shell
+**Given** an invalid crisp installation
+**When** `source .crisp/scripts/activate.sh` is executed
+**Then** Crisp returns an error message reporting any known issues
 
 ### Deactivate Environment
 
-**Acceptance Criteria**
+**Given** an activated environment
+**When** `source .crisp/scripts/deactivate.sh` is executed
+**Then** Crisp commands and environmental variables are removed from the shell
 
-    **Given** an activated environment
-    **When** `source .crisp/scripts/deactivate.sh` is executed
-    **Then** Crisp commands and environmental variables are removed from the shell
+**Given** an inactivated environment
+**When** `source .crisp/scripts/deactivate.sh` is executed
+**Then** Crisp returns error message reporting there is no environment to deactivate
+
+### Status
+
+**Given** an activated environment
+**When** `crisp status` is executed
+**Then** Crisp reports on the current status of the tool (artifact counts, env variables, ...)
+
+> [!Question] What would be useful to get an overview of project here?
+
+**Given** an inactive environment
+**When** `crisp status` is executed
+**Then** Crisp reports there is no environment active, an recommends how to activate one
+
+### Validation
+
+**Given** an activated environment
+**When** `crisp validate <item>` is executed
+**Then** Crisp checks if the item is valid
+
+**Given** an activated environment
+**When** `crisp validate artifact_path` is executed
+**Then** Crisp checks if the item is valid
+
+**Given** an activated environment
+**When** `crisp validate -a ` is executed
+**Then** Crisp checks the entire environment/installation
+
+> [!Question] What is a valid Crisp installation?
+> 
+> - all environmental variable directories exist
+> - script files exist
+> - able to source and run none-destructive functions
+> - "project specific" test?
+> - index files be run? test if exists?
+> - all types have templates
+> - templates are valid
+
+> [!Question] What is a valid template?
 
 ## Artifacts Management
 
 ### Create Artifacts
 
-### Acceptance Criteria
+**Given** an activated environment
+**When** The command `crisp <artifact_type>` is executed
+**Then** Crisp creates a new artifact in appropriate output folder 
+**Then** Crisp creates a new artifact using the appropirate template
+**Then** Crisp creates a new artifact with a unique, none-colliding id
+**Then** The appropriate indexes are updated
 
-    **Given** an activated environment
-    **When** The command `crisp <item>` is executed
-    **Then** Crisp creates the item in the output folder of the current environment.
+**Given** an activated environment
+**When** The command `crisp <malformed_type>` is executed
+**Then** Crisp returns an error and reports possible artifact types
 
-### Customize Artifacts
+**Given** an inactive environment
+**When** The command `crisp <item>` is executed
+**Then** Crisp returns an error and reports no environment is active
 
-### Acceptance Criteria
+### Artifact Parsing
 
-    **Given** an activated environment
-    **When** The command `crisp <item>` is executed
-    **Then** A template in .crisp/templates, of the correct type, is used as the base of the new item.
+Extract useful information from artifacts that can be presented in the CLI or index files.
+
+**Given** valid artifact path
+**When** I call a function like `summarize_artifact`
+**Then** a type-specific summary of the artifact is returned
+
+#### Artifact ID
+#### Markdown Navigation
+#### Description
+#### Parse Frontmatter
+#### Relationships
 
 ## Index
 
-Provide a way to summarize and navigate artifacts through index files.
+Indexing provides a way to generate files that can be used to easily naviagte and get an overview of a project
+
+### Index Layout
     
- - see a short summary of all artifacts in index files
- - see a link to the index so that I can review or navigate to them easily
- - indexes can be created "from scratch"
- - indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
- - indexes are updated only when needed, preserving previously indexed information into new version of index file
+- see a short summary of all artifacts in index files
+- see a link to the index so that I can review or navigate to them easily
+- indexes can be created "from scratch"
+- indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
+- indexes are updated only when needed, preserving previously indexed information into new version of index file
 
-### Acceptance Criteria
+> [!Question] What would be useful information for an overview of each artifact?
 
-    **Given** a project with artifacts,  
-    **When** I run `crisp index`,  
-    **Then** all index files are updated to reflect the current artifacts.
-    
-    **Given** a project with existing index files,  
-    **When** I run `crisp index`,  
-    **Then** only artifacts with modified timestamps after the modified timestamp of their index file are parsed and updated.
-    
-    **Given** a project with existing index files,  
-    **When** I run `crisp index`,  
-    **Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed.
+> [!Question] How can indexes be built from a template or customized for each project?
+> Maybe the parse part of indexing always pulls frontmatter and some kind of easy body summarization (truncate) and a template can just f-string style put data where available
+> **Valid** artifacts, indexes, and templates would then need to be files that request and expose shared frontmatter keys
+> **Valid** artifacts, indexes, and templates would then need to be files have can be parsed for templating
 
-**User Story**
-    As a user, I want to completely reset all index files with `crisp index --hard` so that I can confidently see the current state of all artifacts.
+### Hard Index
 
-**Acceptance Criteria**
+**Given** an activated environment
+**Given** existing index files
+**Given** existing artifact files
+**When** `crisp index --hard` is executed
+**Then** all index files are deleted
+**Then** all artifacts are indexed and new index files are created
+**Then** Crisp reports index and operation status
 
-    **Given** a project with existing indexes and artifacts,  
-    **When** I execute `crisp index --hard`,  
-    **Then** all index files are deleted and recreated from scratch.
+**Given** an inactive environment
+**When** `crisp index --hard` is executed
+**Then** Crisp reports there is no environment active
 
-**Goal**
-    Streamline artifact summarization and ensure efficient indexing functionality.
+**Given** an activated environment
+**Given** no existing index files
+**Given** no existing artifact files
+**When** `crisp index --hard` is executed
+**Then** Crisp completes operation
+**Then** Crisp reports index and operation status (should be 0)
 
-**User Story**
-    As a developer, I want to summarize artifacts through one interface so that the summarizing functionality is easy to integrate and customize.
+**Given** an activated environment
+**Given** no existing index files
+**Given** existing artifact files
+**When** `crisp index --hard` is executed
+**Then** all artifacts are indexed and new index files are created
+**Then** Crisp reports index and operation status (should be 0)
 
-**Acceptance Criteria**
+### Soft Index
 
-    **Given** an artifact path,  
-    **When** I call a function like `summarize_artifact`,  
-    **Then** a type-specific summary of the artifact is returned.
+Indexing can be a time consuming process for projects that have many artifacts.
+Soft indexing updates indexes with only recently changed data, instead indexing all artifacts.
 
-**User Story**
-    As a user, I want indexing to only require parsing and scanning files that have been updated so that the indexing process is fast.
+> [!Question]About how long does it take to index a given set of files?
 
-**Acceptance Criteria**
+#### Identify Recently Modified Files
 
-    **Given** an artifact directory and an index file,  
-    **When** I call a function like `get_modified_artifacts`,  
-    **Then** a list of files that are newer or modified after the index file is returned.
-   
-    **Given** an index file,  
-    **When** I call a function like `parse_index`,  
-    **Then** an associative array, keyed by paths, is returned.
+**Given** an activated environment
+**When** a function like `get_pending <artifact_type>` is called
+**Then** the function returns an array of filepaths where the modfied timestamp of the artifact's file is after the timestamp of its relavent index file
+
+**Given** a project with existing index files
+**When** I run `crisp index`
+**Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed
+
