@@ -5,6 +5,8 @@
 
 # Bats or Crisp logs
 test_env/
+test_crips_env/
+tmp/
 logs/
 
 # If Crisp creates any build artifacts:
