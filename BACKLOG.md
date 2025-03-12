@@ -62,7 +62,7 @@ Users can activate and deativate project specific crisp environments in their sh
 
 > [!Question] What is a valid template?
 
-## Artifacts Management
+## Artifact Management
 
 ### Create Artifacts
 
@@ -97,7 +97,7 @@ Extract useful information from artifacts that can be presented in the CLI or in
 
 ## Index
 
-Indexing provides a way to generate files that can be used to easily naviagte and get an overview of a project
+Indexing provides a way to generate files that can be used to easily navigate and get an overview of a project
 
 ### Index Layout
     
