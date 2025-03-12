@@ -1,8 +1,8 @@
 # Crisp CLI Backlog
 
-## Environment Management
+## Environment
 
-Users can activate and deativate project specific crisp environments in their shell.
+Users can activate and deactivate project specific crisp environments in their shell.
 
 ### Activate Environment
 
@@ -28,30 +28,33 @@ Users can activate and deativate project specific crisp environments in their sh
 
 **Given** an activated environment
 **When** `crisp status` is executed
-**Then** Crisp reports on the current status of the tool (artifact counts, env variables, ...)
+**Then** Crisp reports on the current status of the tool
 
 > [!Question] What would be useful to get an overview of project here?
+>
+> - artifact counts
+> - env variables
 
 **Given** an inactive environment
 **When** `crisp status` is executed
-**Then** Crisp reports there is no environment active, an recommends how to activate one
+**Then** Crisp reports no environment active and recommends how to activate
 
 ### Validation
 
 **Given** an activated environment
-**When** `crisp validate <item>` is executed
+**When** `crisp validate <path>` is executed
 **Then** Crisp checks if the item is valid
 
 **Given** an activated environment
-**When** `crisp validate artifact_path` is executed
+**When** `crisp validate <artifact_path>` is executed
 **Then** Crisp checks if the item is valid
 
 **Given** an activated environment
-**When** `crisp validate -a ` is executed
+**When** `crisp validate -a` is executed
 **Then** Crisp checks the entire environment/installation
 
 > [!Question] What is a valid Crisp installation?
-> 
+>
 > - all environmental variable directories exist
 > - script files exist
 > - able to source and run none-destructive functions
@@ -62,13 +65,13 @@ Users can activate and deativate project specific crisp environments in their sh
 
 > [!Question] What is a valid template?
 
-## Artifact Management
+## Artifacts
 
 ### Create Artifacts
 
 **Given** an activated environment
 **When** The command `crisp add <artifact_type>` is executed
-**Then** Crisp creates a new artifact in appropriate output folder 
+**Then** Crisp creates a new artifact in appropriate output folder
 **Then** Crisp creates a new artifact using the appropirate template
 **Then** Crisp creates a new artifact with a unique, none-colliding id
 **Then** The appropriate indexes are updated
@@ -93,6 +96,7 @@ Extract useful information from artifacts that can be presented in the CLI or in
 > Just truncate?
 
 > [!Question] What information should be processed from each artifact?
+>
 > - Artifact ID
 > - Markdown Navigation
 > - Description
@@ -103,11 +107,22 @@ Extract useful information from artifacts that can be presented in the CLI or in
 
 > [!Question] Should I just pull frontmatter, as is, and a summary, and let other functions determine what is needed?
 
-> [!Question] Are there elements not included in frontmatter that could be usedful? Full/relative paths? Word counts? Formatted elements?
+> [!Question] Are there elements not included in frontmatter that could be useful? Full/relative paths? Word counts? Formatted elements?
+
+## Templates
+
+- each artifact has a template, it is mostly used as a boilerplate file that is copied and renamed with minimal changes. Information is manually filled out in the artifact template.
+- each index has a different template type. They are more complex and "merged" with data from a JSON file. Sections are repeated. All information in the end result is generated and not edited manually.
+- each index is made up of two parts, the index header and the body which is a collection of sections that represent each file being indexed
+- the header contains high level informaiton (file counts, date updated, ...)
+- the index section contains information relavent to each file being indexed
+
+> [!Question] What information about be useful to include in the header? Each artifact type?
 
 ## Index
 
 A process that:
+
 - "Scrapes" information from artifacts (markdown)
 - Records the information in a structured form (json)
 - Produces convenient, navigable index files (markdown)
@@ -162,7 +177,13 @@ Soft indexing updates indexes with only recently changed data, instead indexing 
 - indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
 - indexes are updated only when needed, preserving previously indexed information into new version of index file
 
-> [!Question]About how long does it take to index a given set of files?
+> [!Question] About how long does it take to index a given set of files?
+
+**Given** a project with existing index files
+**Given** a project with existing index files
+**When** I run `crisp index`
+**When** I run `crisp index --soft`
+**Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed
 
 #### Identify Recently Modified Files
 
@@ -170,11 +191,17 @@ Soft indexing updates indexes with only recently changed data, instead indexing 
 **When** a function like `get_pending <artifact_type>` is called
 **Then** the function returns an array of filepaths where the modfied timestamp of the artifact's file is after the timestamp of its relavent index file
 
-**Given** a project with existing index files
-**When** I run `crisp index`
-**Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed
-
 ### Rendering Indexes in Markdown
+
+**Given** an activated environment
+**Given** an `index_cache.json` exists
+**Given** an `index_cache.json` is valid
+**Given** the template requests elements that exist in the source
+**Given** `<artifact_type>_index.md` exists or does not exists
+**When** a function like `render_index <source_path> <template_path> <destination_path>` is called
+**Then** a markdown file is rendered, overwriting or creating at the destination
+**Then** each item in the source uses the template to render a markdown section, all sections are appended to the destination file
+
 - see a short summary of all artifacts in index files
 - see a link to the index so that I can review or navigate to them easily
 
