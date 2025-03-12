@@ -1,4 +1,4 @@
-This is a structured backlog for implementing the Crisp CLI.
+# Crisp CLI Backlog
 
 ## Environment Management
 
@@ -56,7 +56,7 @@ Users can activate and deativate project specific crisp environments in their sh
 > - script files exist
 > - able to source and run none-destructive functions
 > - "project specific" test?
-> - index files be run? test if exists?
+> - index able to run? test if files exists?
 > - all types have templates
 > - templates are valid
 
@@ -67,18 +67,18 @@ Users can activate and deativate project specific crisp environments in their sh
 ### Create Artifacts
 
 **Given** an activated environment
-**When** The command `crisp <artifact_type>` is executed
+**When** The command `crisp add <artifact_type>` is executed
 **Then** Crisp creates a new artifact in appropriate output folder 
 **Then** Crisp creates a new artifact using the appropirate template
 **Then** Crisp creates a new artifact with a unique, none-colliding id
 **Then** The appropriate indexes are updated
 
 **Given** an activated environment
-**When** The command `crisp <malformed_type>` is executed
+**When** The command `crisp add <malformed_type>` is executed
 **Then** Crisp returns an error and reports possible artifact types
 
 **Given** an inactive environment
-**When** The command `crisp <item>` is executed
+**When** The command `crisp add <artifact_type>` is executed
 **Then** Crisp returns an error and reports no environment is active
 
 ### Artifact Parsing
@@ -86,35 +86,47 @@ Users can activate and deativate project specific crisp environments in their sh
 Extract useful information from artifacts that can be presented in the CLI or index files.
 
 **Given** valid artifact path
-**When** I call a function like `summarize_artifact`
-**Then** a type-specific summary of the artifact is returned
+**When** A function like `parse_artifact <path>` is called
+**Then** the frontmatter and a summary of the body is returned.
 
-#### Artifact ID
-#### Markdown Navigation
-#### Description
-#### Parse Frontmatter
-#### Relationships
+> [!Question] How should the body of an item be summarized?
+> Just truncate?
+
+> [!Question] What information should be processed from each artifact?
+> - Artifact ID
+> - Markdown Navigation
+> - Description
+> - Parse Frontmatter
+> - Relationships
+
+> [!Question] Should parsing by artifact specific?
+
+> [!Question] Should I just pull frontmatter, as is, and a summary, and let other functions determine what is needed?
+
+> [!Question] Are there elements not included in frontmatter that could be usedful? Full/relative paths? Word counts? Formatted elements?
 
 ## Index
 
-Indexing provides a way to generate files that can be used to easily navigate and get an overview of a project
+A process that:
+- "Scrapes" information from artifacts (markdown)
+- Records the information in a structured form (json)
+- Produces convenient, navigable index files (markdown)
 
-### Index Layout
-    
-- see a short summary of all artifacts in index files
-- see a link to the index so that I can review or navigate to them easily
-- indexes can be created "from scratch"
-- indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
-- indexes are updated only when needed, preserving previously indexed information into new version of index file
-
-> [!Question] What would be useful information for an overview of each artifact?
+### Process
 
 > [!Question] How can indexes be built from a template or customized for each project?
 > Maybe the parse part of indexing always pulls frontmatter and some kind of easy body summarization (truncate) and a template can just f-string style put data where available
 > **Valid** artifacts, indexes, and templates would then need to be files that request and expose shared frontmatter keys
 > **Valid** artifacts, indexes, and templates would then need to be files have can be parsed for templating
 
-### Hard Index
+> [!Question] What is the process for indexing
+> Maybe indexing should be done using an intermediate step: artifact files are parsed (when needed) and that data is recorded in a form that can be easily interpolated into a md file to present the data.
+> Collecting all frontmatter data into one file and then using that as an index cache, using it to populate a template could be an effective strategy.
+> It is easier to update only the require records when needed and the actual index file can be built from scratch anytime the index is updated.
+
+### Hard Index Command
+
+- indexes can be created "from scratch"
 
 **Given** an activated environment
 **Given** existing index files
@@ -142,10 +154,13 @@ Indexing provides a way to generate files that can be used to easily navigate an
 **Then** all artifacts are indexed and new index files are created
 **Then** Crisp reports index and operation status (should be 0)
 
-### Soft Index
+### Soft Index Command
 
 Indexing can be a time consuming process for projects that have many artifacts.
 Soft indexing updates indexes with only recently changed data, instead indexing all artifacts.
+
+- indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
+- indexes are updated only when needed, preserving previously indexed information into new version of index file
 
 > [!Question]About how long does it take to index a given set of files?
 
@@ -159,3 +174,10 @@ Soft indexing updates indexes with only recently changed data, instead indexing 
 **When** I run `crisp index`
 **Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed
 
+### Rendering Indexes in Markdown
+- see a short summary of all artifacts in index files
+- see a link to the index so that I can review or navigate to them easily
+
+> [!Question] What would be useful information for an overview of each artifact?
+
+> [!Question] What information should be included for each artifact type?
