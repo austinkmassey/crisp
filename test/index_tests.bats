@@ -10,6 +10,50 @@ setup() {
 teardown() {
   rm -rf "$CRISP_DOC"
 }
+@test "crisp index all generates index files in output directory" {
+  run crisp index all
+  [ "$status" -eq 0 ]
+  [ -f "${CRISP_DOC}/backlog_index.md" ]
+  [ -f "${CRISP_DOC}/sprint_index.md" ]
+  [ -f "${CRISP_DOC}/session_index.md" ]
+}
+
+@test "crisp index backlog updates backlog_index.md in output directory" {
+  run rm ${CRISP_DOC}/backlog/*
+  run rm ${CRISP_DOC}/backlog/backlog_index.md
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp add backlog
+  [ "$status" -eq 0 ]
+  run crisp index backlog
+  [ "$status" -eq 0 ]
+  [ -f "${CRISP_DOC}/backlog_index.md" ]
+
+  # Use silent grep to match and exit cleanly
+  grep -q "001.md" "${CRISP_DOC}/backlog_index.md"
+  grep -q "002.md" "${CRISP_DOC}/backlog_index.md"
+  grep -q "003.md" "${CRISP_DOC}/backlog_index.md"
+  [ $? -eq 0 ]
+}
+
+@test "crisp index --hard regenerates indexes in output directory" {
+  run crisp add backlog
+  run crisp add sprint
+  run crisp index all
+  [ -f "${CRISP_DOC}/backlog_index.md" ]
+  [ -f "${CRISP_DOC}/sprint_index.md" ]
+
+  # Modify an index to ensure it is refreshed.
+  echo "MANUAL EDIT" >>"${CRISP_DOC}/backlog_index.md"
+
+  run crisp index all --hard
+  [ "$status" -eq 0 ]
+
+  # The new backlog index should not contain the "MANUAL EDIT" text
+  ! grep "MANUAL EDIT" "${CRISP_DOC}/backlog_index.md"
+}
 
 # Tests for get_pending_files
 # PASS
@@ -94,7 +138,7 @@ teardown() {
 #PASS
 @test "parse_current_index populates index_data from existing index file" {
   local index_file="$CRISP_DOC/test_index.md"
-  cat <<EOF > "$index_file"
+  cat <<EOF >"$index_file"
 - [001.md](docs/backlog/001.md)
 - [002.md](docs/backlog/002.md)
 EOF
@@ -157,11 +201,11 @@ EOF
   run grep -F -- "- [file2.txt](docs/file2.txt)" "$index_file"
   [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
 }
- 
+
 #PASS
 @test "write_index_file overwrites existing index file" {
   local index_file="$CRISP_DOC/test_index.md"
-  echo "Old content" > "$index_file"
+  echo "Old content" >"$index_file"
 
   declare -A index_data=(
     ["file1.txt"]="- [file1.txt](docs/file1.txt)"
@@ -193,4 +237,3 @@ EOF
   run grep -F -- "- [file2.txt]" "$index_file"
   [ "$status" -eq 0 ] # Assert the exit status is 0 (match found)
 }
-

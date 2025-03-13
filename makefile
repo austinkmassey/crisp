@@ -4,18 +4,12 @@
 #
 # This Makefile provides the following functionalities:
 #   - Setup a test environment
-#   - Run Bats tests
-#   - Run index-specific Bats tests
 #   - Teardown test environment
+#   - Run Bats tests
 #   - Install Crisp into a new project directory
-#   - Clean up test artifacts
 #
 # Usage:
-#   make help                     Show available commands
-#   make test                     Setup, run tests, and teardown
-#   make run_index_tests          Run index-specific Bats tests
-#   make install DESTDIR=path     Install Crisp into the specified directory
-#   make clean                    Remove test environment directory
+#     see help rule
 #
 # =============================================================================
 
@@ -46,23 +40,22 @@ INSTALL_DIR := $(DESTDIR)
 
 help:
 	@echo "========================================="
-	@echo "        Crisp Framework Makefile"
+	@echo "        Crisp CLI Tool Makefile"
 	@echo "========================================="
 	@echo ""
 	@echo "Available Targets:"
 	@echo "  help                     Show this help message"
+	@echo "  check_dependencies       Check for required dependencies"
 	@echo "  setup_test               Setup test environment"
-	@echo "  run_tests                Run all Bats tests"
-	@echo "  index_tests              Run index-specific Bats tests"
 	@echo "  teardown_test            Teardown test environment"
-	@echo "  test                     Setup, run tests, and teardown"
+	@echo "  run_tests                Run all Bats tests"
+	@echo "  test                     Setup, run, and teardown_tests"
 	@echo "  install DESTDIR=path     Install Crisp into a new project directory"
 	@echo "  clean                    Remove test environment directory"
-	@echo "  check_dependencies       Check for required dependencies"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
-	@echo "  make index_tests"
+	@echo "  make clean"
 	@echo "  make install DESTDIR=/path/to/my_project"
 	@echo ""
 	@echo "  To run Bats tests with a specific directory:"
@@ -72,7 +65,6 @@ help:
 # =============================================================================
 # Dependency Check
 # =============================================================================
-
 check_dependencies:
 	@command -v bats >/dev/null 2>&1 || { echo "Error: Bats is not installed. Please install Bats to run tests."; exit 1; }
 	@command -v yq >/dev/null 2>&1 || { echo "Error: yq is not installed. Please install yq to parse YAML files."; exit 1; }
@@ -88,24 +80,6 @@ setup_test: check_dependencies
 	@echo "Test environment setup at '$(TEST_ENV_DIR)'"
 
 # =============================================================================
-# Run Bats Tests
-# =============================================================================
-
-run_tests:
-	@echo "Running Bats tests..."
-	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/crisp_test.bats
-	@echo "Bats tests completed."
-
-# =============================================================================
-# Run Index-Specific Tests
-# =============================================================================
-
-run_index_tests:
-	@echo "Running index-specific Bats tests..."
-	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats
-	@echo "Index-specific Bats tests completed."
-
-# =============================================================================
 # Teardown Test Environment
 # =============================================================================
 
@@ -114,12 +88,53 @@ teardown_test:
 	@rm -rf $(TEST_ENV_DIR)
 	@echo "Test environment removed."
 
+clean: teardown_test
+
 # =============================================================================
-# Run All Tests
+# Run Bats Tests
+# =============================================================================
+test: setup_test run_tests teardown_test
+	@echo "All tests executed successfully."
+
+run_tests: run_environment_tests run_artifact_tests run_template_tests run_index_tests
+	@echo "Running Bats tests..."
+
+# =============================================================================
+# Run Environment Tests
 # =============================================================================
 
-test: setup_test run_tests run_index_tests teardown_test
-	@echo "All tests executed successfully."
+run_environment_tests:
+	@echo "Running environment Bats tests..."
+	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/environment_tests.bats
+	@echo "Environment Bats tests completed."
+
+# =============================================================================
+# Run Artifact Tests
+# =============================================================================
+
+run_artifact_tests:
+	@echo "Running artifact Bats tests..."
+	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/artifact_tests.bats
+	@echo "Artifact Bats tests completed."
+
+# =============================================================================
+# Run Template Tests
+# =============================================================================
+
+run_template_tests:
+	#TODO
+	#@echo "Running index-specific Bats tests..."
+	#@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats
+	#@echo "Index-specific Bats tests completed."
+
+# =============================================================================
+# Run Index Tests
+# =============================================================================
+
+run_index_tests:
+	@echo "Running index Bats tests..."
+	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats
+	@echo "Index Bats tests completed."
 
 # =============================================================================
 # Install Crisp into a New Project Directory
@@ -137,12 +152,3 @@ install:
 	@echo "Crisp installed successfully in '$(DESTDIR)/.crisp'."
 	@echo "To activate Crisp, run:"
 	@echo "  source .crisp/scripts/activate.sh"
-
-# =============================================================================
-# Clean Up Test Environment
-# =============================================================================
-
-clean:
-	@echo "Cleaning up test environment..."
-	@rm -rf $(TEST_ENV_DIR)
-	@echo "Cleaned up '$(TEST_ENV_DIR)'"
