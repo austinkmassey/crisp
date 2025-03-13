@@ -5,7 +5,7 @@
 
 # Bats or Crisp logs
 test_env/
-test_crips_env/
+test_crisp_env/
 tmp/
 logs/
 
