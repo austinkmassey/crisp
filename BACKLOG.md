@@ -7,12 +7,17 @@ Users can activate and deactivate project specific crisp environments in their s
 ### Activate Environment
 
 **Given** a valid crisp installation
+**Given** no already activated environment
 **When** `source .crisp/scripts/activate.sh` is executed
 **Then** Crisp commands and environmental variables are sourced into the shell
 
 **Given** an invalid crisp installation
 **When** `source .crisp/scripts/activate.sh` is executed
 **Then** Crisp returns an error message reporting any known issues
+
+**Given** an already activated environment
+**When** `source .crisp/scripts/activate.sh` is executed
+**Then** Crisp returns an error reporting an environment is active
 
 ### Deactivate Environment
 
@@ -33,21 +38,13 @@ Users can activate and deactivate project specific crisp environments in their s
 > [!Question] What would be useful to get an overview of project here?
 >
 > - artifact counts
-> - env variables
+> - environmental variables
 
 **Given** an inactive environment
 **When** `crisp status` is executed
 **Then** Crisp reports no environment active and recommends how to activate
 
 ### Validation
-
-**Given** an activated environment
-**When** `crisp validate <path>` is executed
-**Then** Crisp checks if the item is valid
-
-**Given** an activated environment
-**When** `crisp validate <artifact_path>` is executed
-**Then** Crisp checks if the item is valid
 
 **Given** an activated environment
 **When** `crisp validate -a` is executed
@@ -63,7 +60,18 @@ Users can activate and deactivate project specific crisp environments in their s
 > - all types have templates
 > - templates are valid
 
+**Given** an activated environment
+**When** `crisp validate <path>` is executed
+**Then** Crisp checks if the item is valid
+
+**Given** an activated environment
+**When** `crisp validate <artifact_path>` is executed
+**Then** Crisp checks if the item is valid
+
 > [!Question] What is a valid template?
+>
+> - all requested fields are available in index_cache
+> - parsable by template tool
 
 ## Artifacts
 
@@ -86,34 +94,30 @@ Users can activate and deactivate project specific crisp environments in their s
 
 ### Artifact Parsing
 
-Extract useful information from artifacts that can be presented in the CLI or index files.
+Extract information from each file, primarily, frontmatter, body summary,
+and any other fields idendified that could be useful.
 
 **Given** valid artifact path
 **When** A function like `parse_artifact <path>` is called
-**Then** the frontmatter and a summary of the body is returned.
+**Then** the frontmatter and a summary of the body is returned as json
 
-> [!Question] How should the body of an item be summarized?
-> Just truncate?
+> [!Note] Bodies are summarized by truncation
+>unless a better strategy can be idendified.
 
-> [!Question] What information should be processed from each artifact?
->
-> - Artifact ID
-> - Markdown Navigation
-> - Description
-> - Parse Frontmatter
-> - Relationships
-
-> [!Question] Should parsing by artifact specific?
-
-> [!Question] Should I just pull frontmatter, as is, and a summary, and let other functions determine what is needed?
-
-> [!Question] Are there elements not included in frontmatter that could be useful? Full/relative paths? Word counts? Formatted elements?
+> [!Question] In addition to frontmatter, what should be parsed from an artifact?
+> Full/relative paths?
+> Word counts?
+> Formatted elements?
 
 ## Templates
 
-- each artifact has a template, it is mostly used as a boilerplate file that is copied and renamed with minimal changes. Information is manually filled out in the artifact template.
-- each index has a different template type. They are more complex and "merged" with data from a JSON file. Sections are repeated. All information in the end result is generated and not edited manually.
-- each index is made up of two parts, the index header and the body which is a collection of sections that represent each file being indexed
+- each artifact has a template, it is mostly used as a boilerplate file that is copied
+and renamed with minimal changes. Information is manually
+filled out in the artifact template.
+- each index has a different template type. They are more complex and
+"merged" with data from a JSON file. Sections are repeated. All information in the end result is generated and not edited manually.
+- each index is made up of two parts, the index header and the body
+which is a collection of sections that represent each file being indexed
 - the header contains high level informaiton (file counts, date updated, ...)
 - the index section contains information relavent to each file being indexed
 
@@ -130,14 +134,22 @@ A process that:
 ### Process
 
 > [!Question] How can indexes be built from a template or customized for each project?
-> Maybe the parse part of indexing always pulls frontmatter and some kind of easy body summarization (truncate) and a template can just f-string style put data where available
-> **Valid** artifacts, indexes, and templates would then need to be files that request and expose shared frontmatter keys
-> **Valid** artifacts, indexes, and templates would then need to be files have can be parsed for templating
+> Maybe the parse part of indexing always pulls frontmatter and some kind
+> of easy body summarization (truncate) and a template can just f-string style
+> put data where available
+> **Valid** artifacts, indexes, and templates would then need to be files
+> that request and expose shared frontmatter keys
+> **Valid** artifacts, indexes, and templates would then need to be files
+> have can be parsed for templating
 
 > [!Question] What is the process for indexing
-> Maybe indexing should be done using an intermediate step: artifact files are parsed (when needed) and that data is recorded in a form that can be easily interpolated into a md file to present the data.
-> Collecting all frontmatter data into one file and then using that as an index cache, using it to populate a template could be an effective strategy.
-> It is easier to update only the require records when needed and the actual index file can be built from scratch anytime the index is updated.
+> Maybe indexing should be done using an intermediate step: artifact files
+> are parsed (when needed) and that data is recorded in a form that can
+> be easily interpolated into a md file to present the data.
+> Collecting all frontmatter data into one file and then using that
+> as an index cache, using it to populate a template could be an effective strategy.
+> It is easier to update only the require records when needed and the
+> actual index file can be built from scratch anytime the index is updated.
 
 ### Hard Index Command
 
@@ -172,10 +184,13 @@ A process that:
 ### Soft Index Command
 
 Indexing can be a time consuming process for projects that have many artifacts.
-Soft indexing updates indexes with only recently changed data, instead indexing all artifacts.
+Soft indexing updates indexes with only recently changed data, instead
+indexing all artifacts.
 
-- indexes are updated only when needed by looking at timestamps, to reduce time to index and number of lines to scan
-- indexes are updated only when needed, preserving previously indexed information into new version of index file
+- indexes are updated only when needed by looking at timestamps, to reduce
+time to index and number of lines to scan
+- indexes are updated only when needed, preserving previously indexed information
+into new version of index file
 
 > [!Question] About how long does it take to index a given set of files?
 
@@ -183,13 +198,15 @@ Soft indexing updates indexes with only recently changed data, instead indexing 
 **Given** a project with existing index files
 **When** I run `crisp index`
 **When** I run `crisp index --soft`
-**Then** entries in the index that point to unchanged artifacts persist in the next version of the index file, and only entries for updated artifacts are changed
+**Then** entries in the index that point to unchanged artifacts persist in the
+next version of the index file, and only entries for updated artifacts are changed
 
 #### Identify Recently Modified Files
 
 **Given** an activated environment
 **When** a function like `get_pending <artifact_type>` is called
-**Then** the function returns an array of filepaths where the modfied timestamp of the artifact's file is after the timestamp of its relavent index file
+**Then** the function returns an array of filepaths where the modfied timestamp
+of the artifact's file is after the timestamp of its relavent index file
 
 ### Rendering Indexes in Markdown
 
@@ -198,9 +215,11 @@ Soft indexing updates indexes with only recently changed data, instead indexing 
 **Given** an `index_cache.json` is valid
 **Given** the template requests elements that exist in the source
 **Given** `<artifact_type>_index.md` exists or does not exists
-**When** a function like `render_index <source_path> <template_path> <destination_path>` is called
+**When** a function like `render_index <source_path> <template_path> <destination_path>`
+is called
 **Then** a markdown file is rendered, overwriting or creating at the destination
-**Then** each item in the source uses the template to render a markdown section, all sections are appended to the destination file
+**Then** each item in the source uses the template to render a markdown section,
+all sections are appended to the destination file
 
 - see a short summary of all artifacts in index files
 - see a link to the index so that I can review or navigate to them easily
