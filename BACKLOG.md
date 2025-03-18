@@ -8,25 +8,25 @@ Users can activate and deactivate project specific crisp environments in their s
 
 **Given** a valid crisp installation
 **Given** no already activated environment
-**When** `source .crisp/scripts/activate.sh` is executed
+**When** `source .crisp/activate.sh <path/to/config.yaml>` is executed
 **Then** Crisp commands and environmental variables are sourced into the shell
 
 **Given** an invalid crisp installation
-**When** `source .crisp/scripts/activate.sh` is executed
+**When** `source .crisp/activate.sh <path/to/config.yaml>` is executed
 **Then** Crisp returns an error message reporting any known issues
 
 **Given** an already activated environment
-**When** `source .crisp/scripts/activate.sh` is executed
+**When** `source .crisp/activate.sh <path/to/config.yaml>` is executed
 **Then** Crisp returns an error reporting an environment is active
 
 ### Deactivate Environment
 
 **Given** an activated environment
-**When** `source .crisp/scripts/deactivate.sh` is executed
+**When** `source .crisp/deactivate.sh` is executed
 **Then** Crisp commands and environmental variables are removed from the shell
 
 **Given** an inactivated environment
-**When** `source .crisp/scripts/deactivate.sh` is executed
+**When** `source .crisp/deactivate.sh` is executed
 **Then** Crisp returns error message reporting there is no environment to deactivate
 
 ### Status
@@ -44,6 +44,8 @@ Users can activate and deactivate project specific crisp environments in their s
 **When** `crisp status` is executed
 **Then** Crisp reports no environment active and recommends how to activate
 
+### Installation
+
 ### Validation
 
 **Given** an activated environment
@@ -51,6 +53,13 @@ Users can activate and deactivate project specific crisp environments in their s
 **Then** Crisp checks the entire environment/installation
 
 > [!Question] What is a valid Crisp installation?
+>
+> - has a config.yaml in crisp_root
+> - has a scripts dir in crisp_root
+> - has a project dir
+> - has a output dir
+> - has templates
+> - templates are valid??
 >
 > - all environmental variable directories exist
 > - script files exist

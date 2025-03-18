@@ -10,7 +10,7 @@ SUBCOMMAND="${1:-}"
 case "$SUBCOMMAND" in
   status)
     shift
-    source "${CRISP_SCRIPT}/status.sh"
+    source "${CRISP_SCRIPT}/environment.sh"
     crisp_status "$@"
     ;;
   add)
