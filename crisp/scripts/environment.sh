@@ -21,6 +21,16 @@ function activate() {
   echo $crisp
   scripts="$1/scripts"
 
+  if [[ -z "$crisp" ]]; then
+    echo "Crisp directory does not exist"
+    return 1
+  fi
+
+  if [[ -n "$CRISP_ACTIVE" ]]; then
+    echo "A crisp environment, is already active in this shell."
+    return 1
+  fi
+
   # Add Crisp to the PATH
   if [[ ":$PATH:" != *":$crisp:"* ]]; then
     export PATH="${crisp}:$PATH"

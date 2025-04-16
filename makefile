@@ -68,7 +68,6 @@ check_dependencies:
 # =============================================================================
 # Setup Test Environment
 # =============================================================================
-
 setup_test: check_dependencies
 	@echo "Test environment setup at '$(TEST_ENV_DIR)'"
 	@echo "Setting up test environment..."
@@ -78,7 +77,6 @@ setup_test: check_dependencies
 # =============================================================================
 # Teardown Test Environment
 # =============================================================================
-
 teardown_test:
 	@echo "Tearing down test environment..."
 	@rm -rf $(TEST_ENV_DIR)
@@ -98,7 +96,6 @@ run_tests: run_environment_tests run_artifact_tests run_template_tests run_index
 # =============================================================================
 # Run Environment Tests
 # =============================================================================
-
 run_environment_tests:
 	@echo "Running environment Bats tests..."
 	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/environment_tests.bats
@@ -107,7 +104,6 @@ run_environment_tests:
 # =============================================================================
 # Run Artifact Tests
 # =============================================================================
-
 run_artifact_tests:
 	@echo "Running artifact Bats tests..."
 	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/artifact_tests.bats
@@ -116,7 +112,6 @@ run_artifact_tests:
 # =============================================================================
 # Run Template Tests
 # =============================================================================
-
 run_template_tests:
 	#TODO
 	#@echo "Running index-specific Bats tests..."
@@ -126,7 +121,6 @@ run_template_tests:
 # =============================================================================
 # Run Index Tests
 # =============================================================================
-
 run_index_tests:
 	@echo "Running index Bats tests..."
 	@CRISP_TEST_DIR=$(TEST_ENV_DIR) bats $(TEST_DIR)/index_tests.bats

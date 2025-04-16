@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bats
 
 # Crisp BATS Test Suite
@@ -12,8 +11,7 @@
 setup() {
   if [ -n "$CRISP_TEST_DIR" ]; then
     cd "$CRISP_TEST_DIR"
-    # Source the activate script to enable Crisp commands
-    source crisp/scripts/activate.sh
+   source .crisp/activate.sh .crisp/config.yaml
   else
     echo "CRISP_TEST_DIR not set" >&2
     exit 1
@@ -22,7 +20,7 @@ setup() {
 
 teardown() {
   # Deactivate Crisp after each test
-  source crisp/scripts/deactivate.sh
+  deactivate
 }
 
 @test "crisp add backlog creates a new backlog artifact in output directory" {
