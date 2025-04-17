@@ -20,7 +20,7 @@ function crisp_add() {
   local artifact_dir
   artifact_dir="${CRISP_DOC}/${type}"
 
-  # Get and validate template file 
+  # Get and validate template file
   local template_file
   template_file="${CRISP_ROOT}/template/${type}.template"
   if [[ ! -f "$template_file" ]]; then
@@ -49,4 +49,3 @@ function crisp_add() {
 
   echo "Created new $type artifact: $new_artifact"
 }
-

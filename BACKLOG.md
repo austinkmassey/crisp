@@ -89,7 +89,7 @@ Users can activate and deactivate project specific crisp environments in their s
 **Given** an activated environment
 **When** The command `crisp add <artifact_type>` is executed
 **Then** Crisp creates a new artifact in appropriate output folder
-**Then** Crisp creates a new artifact using the appropirate template
+**Then** Crisp creates a new artifact using the appropriate template
 **Then** Crisp creates a new artifact with a unique, none-colliding id
 **Then** The appropriate indexes are updated
 
@@ -99,7 +99,7 @@ Users can activate and deactivate project specific crisp environments in their s
 
 **Given** an inactive environment
 **When** The command `crisp add <artifact_type>` is executed
-**Then** Crisp returns an error and reports no environment is active
+**Then** OS should return a "crisp" not found error, or something similar
 
 ### Artifact Parsing
 
