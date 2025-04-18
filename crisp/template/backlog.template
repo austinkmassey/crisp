@@ -1,22 +1,23 @@
 ---
-title: "Default backlog title"
-priority: "Must Have"
-status: "Open"
-sprint: [[unassigned]]
-time: "1h"
+filename: $FILENAME
+description: $DESCRIPTION
+priority: $PRIORITY
+sprint: $SPRINT
+status: $STATUS
+pred_ttc: $PRED_TTC
+actu_ttc: $ACTU_TCC
 ---
 
-**User Value Statement:**
-As a developer, I need a clear understanding of the project's architecture so that I can start building the product with alignment, consistency, and clarity.
+# $DESCRIPTION
 
-**Requirement Description:**
-- Define the project's high-level architecture and major components.
-- Prepare the code repository with a basic skeleton and packaging infrastructure to streamline future development.
+## GOAL
+$BODY_GOAL
 
-**Acceptance Criteria:**
-- **Architecture Overview Document:** Includes a diagram and a brief description of each component's role and technology. Stored in `docs/architecture.md`.
-- **Initial Git and Code Setup:** Code repository contains a basic Python project structure (e.g., source directories, `setup.py`) to enable immediate iteration.
-- All documents reside under version control in the project's repository. `README.md` links to each artifact for easy navigation.
+## Acceptance Criteria
+$BODY_ACCEPTANCE
 
-**Supporting Notes/Attachments:**
-- NB will be used to record and manage the backlog items.
+## WARNING
+$BODY_WARNING
+
+## CONTEXT
+$BODY_CONTEXT

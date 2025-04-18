@@ -1,11 +1,11 @@
 ## Crisp Principles
 
-- use the same tools for working with code and documentation 
+- use the same tools for working with code and documentation
 - charter the project
 - organize project tasks in a backlog
 - develop users stories and tests for each backlog item
-- use sprints to communicate progress to the outside world
 - use sessions to monitor progress and to review efforts
+- use sprints to communicate progress to the outside world
 
 ## Crisp Tool
 
@@ -25,7 +25,6 @@
 - Encapsulated within the parent project’s `.crisp` folder and installed per-project.
 - Minimized reliance on external scripts, tools, or files (except `make`, `bash`, `yq`).
 - Supports flexible project customization through templates, configurations, and automated testing.
-
 
 ### Usage
 
@@ -156,4 +155,3 @@ Run tests in test/crisp_tests.bats (from your test directory):
     bats crisp_tests.bats
 
 This layout and code give you a minimal, functional Crisp framework to build upon, along with automated tests to ensure your Crisp commands work as expected. Adjust the scripts, Makefile, and test logic as your project grows and requires additional functionality!
-

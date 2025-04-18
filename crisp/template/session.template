@@ -2,6 +2,7 @@
 session: "1"
 date: "YYYY-MM-DD"
 description: "Session details"
+backlog-items: [filename]
 ---
 
 # Session Notes

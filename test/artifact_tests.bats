@@ -12,6 +12,7 @@ setup() {
   if [ -n "$CRISP_TEST_DIR" ]; then
     cd "$CRISP_TEST_DIR"
     source .crisp/activate.sh .crisp/config.yaml
+    source .crisp/artifact.sh
   else
     echo "CRISP_TEST_DIR not set" >&2
     exit 1
@@ -21,6 +22,19 @@ setup() {
 teardown() {
   # Deactivate Crisp after each test
   deactivate
+}
+
+@test "validate types" {
+  run valid_type "backlog"
+  [ "$status" -eq 0 ]
+  run valid_type "session"
+  [ "$status" -eq 0 ]
+  run valid_type "sprint"
+  [ "$status" -eq 0 ]
+  run valid_type "invalid_type"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"A crisp environment, is already active in this shell."* ]]
+
 }
 
 @test "add backlog creates new file in backlog directory" {

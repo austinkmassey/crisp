@@ -77,35 +77,95 @@ Users can activate and deactivate project specific crisp environments in their s
 **When** `crisp validate <artifact_path>` is executed
 **Then** Crisp checks if the item is valid
 
-> [!Question] What is a valid template?
->
-> - all requested fields are available in index_cache
-> - parsable by template tool
-
 ## Artifacts
 
-### Create Artifacts
+### Types
 
 **Given** an activated environment
-**When** The command `crisp add <artifact_type>` is executed
+**When** valid_type(type) status
+**Then** an error is returned if the type is invalid
+
+**Given** an activated environment
+**When** `crisp types` is executed
+**Then** a help message about types is returned
+
+> [!Question] What is a valid artifact type?
+>
+> - type is listed in config
+> - type has valid template
+
+### Templates
+
+> [!Note] Two types of templates
+> Artifacts and indexes both use templates, but these are different entities
+
+each artifact has a template, it is mostly used as a boilerplate file that is copied and renamed with minimal changes. Information is manually filled out in the artifact template.
+
+**Given** a valid artifact_type
+**When** path_template(artifact_type): string
+**Then** a file path for the relevant template is returned
+
+**Given** a validate template file_path
+**When** valid_template(file_path): status codes
+**Then** an error is returned if the template is not valid
+**Then** an error is returned if the template does not exists
+
+> [!Question] What is a valid artifact template?
+>
+> - all requested fields are available in index_cache
+> - parsable frontmatter
+> - parsable body
+> - how to check variables?
+
+#### crisp list-fields
+
+**Given** a valid artifact_type
+**Given** an activated environment
+**Given** a valid template
+**When** `crisp list-fields <artifact_type>` is executed
+**Then** returns a list of parameters available to pass to template, based on parsed template
+
+### Create
+
+#### render_artifact()
+
+**Given** ...
+**When** `render_artifact(params, template_path, out_path)
+**Then** a new file is produced
+
+#### crisp create
+
+**Given** an activated environment
+**Given** a valid artifact_type
+**Given** a valid template exists
+**When** The command `crisp create <artifact_type>` is executed with no parameters
 **Then** Crisp creates a new artifact in appropriate output folder
-**Then** Crisp creates a new artifact using the appropriate template
+**Then** Crisp creates a new artifact using the appropriate template, all parameters values return `<parameter_name>_placeholder`
 **Then** Crisp creates a new artifact with a unique, none-colliding id
 **Then** The appropriate indexes are updated
 
 **Given** an activated environment
-**When** The command `crisp add <malformed_type>` is executed
+**Given** a valid artifact_type
+**Given** a valid template
+**When** The command `crisp create <artifact_type>` is executed with parameters
+**Then** Crisp creates a new artifact in appropriate output folder
+**Then** Crisp creates a new artifact using the appropriate template, all parameters values return the passed value
+**Then** Crisp creates a new artifact with a unique, none-colliding id
+**Then** The appropriate indexes are updated
+
+**Given** an activated environment
+**When** The command `crisp create <malformed_type>` is executed
 **Then** Crisp returns an error and reports possible artifact types
 
 **Given** an inactive environment
-**When** The command `crisp add <artifact_type>` is executed
+**When** The command `crisp create <artifact_type>` is executed
 **Then** OS should return a "crisp" not found error, or something similar
 
-### Artifact Parsing
+### Parsing
 
-Extract information from each file, primarily, frontmatter, body summary,
-and any other fields idendified that could be useful.
+#### to_json()
 
+Extract information from each file: all frontmatter, each markdown heading from the file body, into a json file
 **Given** valid artifact path
 **When** A function like `parse_artifact <path>` is called
 **Then** the frontmatter and a summary of the body is returned as json
@@ -118,21 +178,14 @@ and any other fields idendified that could be useful.
 > Word counts?
 > Formatted elements?
 
-## Templates
+## Index
 
-- each artifact has a template, it is mostly used as a boilerplate file that is copied
-and renamed with minimal changes. Information is manually
-filled out in the artifact template.
-- each index has a different template type. They are more complex and
-"merged" with data from a JSON file. Sections are repeated. All information in the end result is generated and not edited manually.
-- each index is made up of two parts, the index header and the body
-which is a collection of sections that represent each file being indexed
-- the header contains high level informaiton (file counts, date updated, ...)
+- each index has a different template type. They are more complex and "merged" with data from a JSON file. Sections are repeated. All information in the end result is generated and not edited manually.
+- each index is made up of two parts, the index header and the body which is a collection of sections that represent each file being indexed
+- the header contains high level information (file counts, date updated, ...)
 - the index section contains information relavent to each file being indexed
 
 > [!Question] What information about be useful to include in the header? Each artifact type?
-
-## Index
 
 A process that:
 
@@ -214,8 +267,7 @@ next version of the index file, and only entries for updated artifacts are chang
 
 **Given** an activated environment
 **When** a function like `get_pending <artifact_type>` is called
-**Then** the function returns an array of filepaths where the modfied timestamp
-of the artifact's file is after the timestamp of its relavent index file
+**Then** the function returns an array of filepaths where the modfied timestamp of the artifact's file is after the timestamp of its relavent index file
 
 ### Rendering Indexes in Markdown
 
@@ -227,8 +279,7 @@ of the artifact's file is after the timestamp of its relavent index file
 **When** a function like `render_index <source_path> <template_path> <destination_path>`
 is called
 **Then** a markdown file is rendered, overwriting or creating at the destination
-**Then** each item in the source uses the template to render a markdown section,
-all sections are appended to the destination file
+**Then** each item in the source uses the template to render a markdown section, all sections are appended to the destination file
 
 - see a short summary of all artifacts in index files
 - see a link to the index so that I can review or navigate to them easily

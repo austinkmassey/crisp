@@ -7,4 +7,14 @@ crisp:
   output_directory: "docs"
   project_dir: ""
   crisp_dir: ""
-
+  cache_dir: ""
+  artifact_type:
+    backlog:
+      description:
+      template: template/backlog.template
+    session:
+      description:
+      template: template/session.template
+    sprint:
+      description:
+      template: template/sprint.template
